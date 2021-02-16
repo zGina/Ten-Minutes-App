@@ -15,8 +15,8 @@ import (
 // start, end int, order, sort string
 func (d *TenDatabase) GetAttackPatterns(paging *model.Paging) []*model.AttackPattern {
 	attackPatterns := []*model.AttackPattern{}
-	cursor, err := d.DB.Collection("attackPatterns").
-		Find(context.Background(), bson.D{},
+	cursor, err := d.DB.Collection("mitre_attack").
+		Find(context.Background(), bson.M{"type": "attack-pattern"},
 			&options.FindOptions{
 				Skip:  paging.Skip,
 				Sort:  bson.D{bson.E{Key: paging.SortKey, Value: paging.SortVal}},
@@ -42,11 +42,9 @@ func (d *TenDatabase) GetAttackPatterns(paging *model.Paging) []*model.AttackPat
 func (d *TenDatabase) CreateAttackPattern(attackPattern *model.AttackPattern) *model.AttackPattern {
 	_, result := d.DB.Collection("attackPatterns").
 		InsertOne(context.Background(), attackPattern)
-
 	if result != nil {
 		return attackPattern
 	}
-
 	return nil
 }
 
@@ -55,6 +53,18 @@ func (d *TenDatabase) GetAttackPatternByName(name string) *model.AttackPattern {
 	var attackPattern *model.AttackPattern
 	err := d.DB.Collection("attackPatterns").
 		FindOne(context.Background(), bson.D{{Key: "name", Value: name}}).
+		Decode(&attackPattern)
+	if err != nil {
+		return nil
+	}
+	return attackPattern
+}
+
+// GetAttackPatternByStixID returns the user by the given name or nil.
+func (d *TenDatabase) GetAttackPatternByStixID(id string) *model.AttackPattern {
+	var attackPattern *model.AttackPattern
+	err := d.DB.Collection("attackPatterns").
+		FindOne(context.Background(), bson.D{{Key: "id", Value: id}}).
 		Decode(&attackPattern)
 	if err != nil {
 		return nil

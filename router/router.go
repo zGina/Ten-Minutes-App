@@ -35,6 +35,8 @@ func Create(db *database.TenDatabase, vInfo *model.VersionInfo, conf *config.Con
 	})
 
 	userHandler := api.UserAPI{DB: db}
+	attackPatternAPIHandler := api.AttackPatternAPI{DB: db}
+	relationshipAPIHandler := api.RelationshipAPI{DB: db}
 	postHandler := api.PostAPI{DB: db}
 
 	postU := g.Group("/users")
@@ -44,6 +46,24 @@ func Create(db *database.TenDatabase, vInfo *model.VersionInfo, conf *config.Con
 		postU.GET(":id", userHandler.GetUserByID)
 		postU.PUT(":id", userHandler.UpdateUserByID)
 		postU.DELETE(":id", userHandler.DeleteUserByID)
+	}
+
+	postAP := g.Group("/attackPatterns")
+	{
+		postAP.GET("", attackPatternAPIHandler.GetAttackPatterns)
+		postAP.POST("", attackPatternAPIHandler.CreateAttackPattern)
+		postAP.GET(":id", attackPatternAPIHandler.GetAttackPatternByID)
+		postAP.PUT(":id", attackPatternAPIHandler.UpdateAttackPatternByID)
+		postAP.DELETE(":id", attackPatternAPIHandler.DeleteAttackPatternByID)
+	}
+
+	postR := g.Group("/relationships")
+	{
+		postR.GET("", relationshipAPIHandler.GetRelationships)
+		postR.POST("", relationshipAPIHandler.CreateRelationship)
+		postR.GET(":id", relationshipAPIHandler.GetRelationshipByID)
+		postR.PUT(":id", relationshipAPIHandler.UpdateRelationshipByID)
+		postR.DELETE(":id", relationshipAPIHandler.DeleteRelationshipByID)
 	}
 
 	postG := g.Group("/posts")

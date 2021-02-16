@@ -8,15 +8,8 @@ import (
 
 func (s *DatabaseSuite) TestCreateUser() {
 	s.db.DB.Collection("users").Drop(nil)
-
-	// addresses = make([]model.UserAddressGeo, 0, 2)
-	// addresses[0] = model.UserAddressGeo{Lat: "-37.3159",
-	// 	Lng: "81.1496"}
-	// addresses[1] = model.UserAddressGeo{Lat: "-3.3159",
-	// 	Lng: "1.14999"}
-
 	kirk := (&model.User{
-		Name:     "无uwu",
+		Name:     "Graham",
 		UserName: "Bret",
 		Email:    "Sincere@april.biz",
 		Address: model.UserAddress{

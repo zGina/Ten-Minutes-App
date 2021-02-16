@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,14 @@ func withID(ctx *gin.Context, name string, f func(id primitive.ObjectID)) {
 		ctx.AbortWithError(400, errors.New("invalid id"))
 	}
 }
+
+// func withStixID(ctx *gin.Context, name string, f func(id string)) {
+// 	if id, err := primitive.ObjectIDFromHex(ctx.Param(name)); err == nil {
+// 		f(id)
+// 	 else {
+// 		ctx.AbortWithError(400, errors.New("invalid id"))
+// 	}
+// }
 
 func withIDs(ctx *gin.Context, name string, f func(id []primitive.ObjectID)) {
 	ids, b := ctx.GetQueryArray(name)

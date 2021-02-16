@@ -62,6 +62,18 @@ func (d *TenDatabase) GetUserByName(name string) *model.User {
 	return user
 }
 
+// GetUserByName returns the user by the given name or nil.
+func (d *TenDatabase) GetUserByStixID(id string) *model.User {
+	var user *model.User
+	err := d.DB.Collection("users").
+		FindOne(context.Background(), bson.D{{Key: "id", Value: id}}).
+		Decode(&user)
+	if err != nil {
+		return nil
+	}
+	return user
+}
+
 // GetUserByIDs returns the user by the given id or nil.
 func (d *TenDatabase) GetUserByIDs(ids []primitive.ObjectID) []*model.User {
 	var users []*model.User
