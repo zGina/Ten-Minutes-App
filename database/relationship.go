@@ -7,7 +7,6 @@ import (
 
 	"github.com/lotteryjs/ten-minutes-app/model"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -64,7 +63,7 @@ func (d *TenDatabase) GetRelationshipByName(name string) *model.Relationship {
 func (d *TenDatabase) GetRelationshipByStixID(id string) *model.Relationship {
 	var relationship *model.Relationship
 	err := d.DB.Collection("mitre_attack").
-		FindOne(context.Background(), bson.D{{Key: "id", Value: id}}).
+		FindOne(context.Background(), bson.M{"id": id}).
 		Decode(&relationship)
 	if err != nil {
 		return nil
@@ -73,11 +72,11 @@ func (d *TenDatabase) GetRelationshipByStixID(id string) *model.Relationship {
 }
 
 // GetRelationshipByIDs returns the relationship by the given id or nil.
-func (d *TenDatabase) GetRelationshipByIDs(ids []primitive.ObjectID) []*model.Relationship {
+func (d *TenDatabase) GetRelationshipByIDs(ids []string) []*model.Relationship {
 	var relationships []*model.Relationship
 	cursor, err := d.DB.Collection("mitre_attack").
 		Find(context.Background(), bson.D{{
-			Key: "_id",
+			Key: "id",
 			Value: bson.D{{
 				Key:   "$in",
 				Value: ids,
@@ -109,19 +108,19 @@ func (d *TenDatabase) CountRelationship() string {
 }
 
 // DeleteRelationshipByID deletes a relationship by its id.
-func (d *TenDatabase) DeleteRelationshipByID(id primitive.ObjectID) error {
+func (d *TenDatabase) DeleteRelationshipByID(id string) error {
 	if d.CountPost(bson.D{{Key: "relationshipId", Value: id}}) == "0" {
-		_, err := d.DB.Collection("mitre_attack").DeleteOne(context.Background(), bson.D{{Key: "_id", Value: id}})
+		_, err := d.DB.Collection("mitre_attack").DeleteOne(context.Background(), bson.M{"id": id})
 		return err
 	}
 	return errors.New("the current relationship has posts published")
 }
 
 // GetRelationshipByID get a relationship by its id.
-func (d *TenDatabase) GetRelationshipByID(id primitive.ObjectID) *model.Relationship {
+func (d *TenDatabase) GetRelationshipByID(id string) *model.Relationship {
 	var relationship *model.Relationship
 	err := d.DB.Collection("mitre_attack").
-		FindOne(context.Background(), bson.D{{Key: "_id", Value: id}}).
+		FindOne(context.Background(), bson.M{"id": id}).
 		Decode(&relationship)
 	if err != nil {
 		return nil
@@ -133,7 +132,7 @@ func (d *TenDatabase) GetRelationshipByID(id primitive.ObjectID) *model.Relation
 func (d *TenDatabase) UpdateRelationship(relationship *model.Relationship) *model.Relationship {
 	result := d.DB.Collection("mitre_attack").
 		FindOneAndReplace(context.Background(),
-			bson.D{{Key: "_id", Value: relationship.ID}},
+			bson.D{{Key: "id", Value: relationship.ID}},
 			relationship,
 			&options.FindOneAndReplaceOptions{},
 		)

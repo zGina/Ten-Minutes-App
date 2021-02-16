@@ -2,11 +2,11 @@ package database
 
 import (
 	"context"
+	"strconv"
+
 	"github.com/lotteryjs/ten-minutes-app/model"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"strconv"
 )
 
 // GetPosts returns all posts.
@@ -59,7 +59,7 @@ func (d *TenDatabase) CreatePost(post *model.Post) *model.Post {
 }
 
 // GetPostByID returns the post by the given id or nil.
-func (d *TenDatabase) GetPostByID(id primitive.ObjectID) *model.Post {
+func (d *TenDatabase) GetPostByID(id string) *model.Post {
 	var post *model.Post
 	err := d.DB.Collection("posts").
 		FindOne(context.Background(), bson.D{{Key: "_id", Value: id}}).
@@ -71,7 +71,7 @@ func (d *TenDatabase) GetPostByID(id primitive.ObjectID) *model.Post {
 }
 
 // DeletePostByID deletes a post by its id.
-func (d *TenDatabase) DeletePostByID(id primitive.ObjectID) error {
+func (d *TenDatabase) DeletePostByID(id string) error {
 	_, err := d.DB.Collection("posts").DeleteOne(context.Background(), bson.D{{Key: "_id", Value: id}})
 	return err
 }

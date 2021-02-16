@@ -21,7 +21,7 @@ const AttackPatternForm =(props:any)=>{
          {/* <TextInput source="id" /> */}
           <TextInput source="name" />
           <TextInput source="description" />
-          <TextInput source="id_" />
+          <TextInput source="id" />
           <TextInput source="type" />
 
         <ArrayInput source='kill_chain_phases'>

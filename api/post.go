@@ -2,21 +2,22 @@ package api
 
 import (
 	"errors"
+	"net/http"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/lotteryjs/ten-minutes-app/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"net/http"
-	"strconv"
 )
 
 // The PostDatabase interface for encapsulating database access.
 type PostDatabase interface {
 	GetPosts(paging *model.Paging) []*model.Post
-	GetPostByID(id primitive.ObjectID) *model.Post
+	GetPostByID(id string) *model.Post
 	CreatePost(post *model.Post) *model.Post
 	UpdatePost(post *model.Post) *model.Post
-	DeletePostByID(id primitive.ObjectID) error
+	DeletePostByID(id string) error
 	CountPost(condition interface{}) string
 }
 
@@ -89,7 +90,7 @@ func (a *PostAPI) GetPosts(ctx *gin.Context) {
 
 // GetPostByID returns the post by id
 func (a *PostAPI) GetPostByID(ctx *gin.Context) {
-	withID(ctx, "id", func(id primitive.ObjectID) {
+	withID(ctx, "id", func(id string) {
 		if post := a.DB.GetPostByID(id); post != nil {
 			ctx.JSON(200, post)
 		} else {
@@ -100,7 +101,7 @@ func (a *PostAPI) GetPostByID(ctx *gin.Context) {
 
 // DeletePostByID deletes the post by id
 func (a *PostAPI) DeletePostByID(ctx *gin.Context) {
-	withID(ctx, "id", func(id primitive.ObjectID) {
+	withID(ctx, "id", func(id string) {
 		if err := a.DB.DeletePostByID(id); err == nil {
 			ctx.JSON(200, http.StatusOK)
 		} else {
@@ -111,7 +112,7 @@ func (a *PostAPI) DeletePostByID(ctx *gin.Context) {
 
 // UpdatePostByID is
 func (a *PostAPI) UpdatePostByID(ctx *gin.Context) {
-	withID(ctx, "id", func(id primitive.ObjectID) {
+	withID(ctx, "id", func(id string) {
 		var post = model.Post{}
 		abort := errors.New("post does not exist")
 		if err := ctx.ShouldBind(&post); err == nil {

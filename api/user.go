@@ -7,14 +7,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lotteryjs/ten-minutes-app/model"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // The UserDatabase interface for encapsulating database access.
 type UserDatabase interface {
-	GetUserByIDs(ids []primitive.ObjectID) []*model.User
-	GetUserByID(id primitive.ObjectID) *model.User
-	DeleteUserByID(id primitive.ObjectID) error
+	GetUserByIDs(ids []string) []*model.User
+	GetUserByID(id string) *model.User
+	DeleteUserByID(id string) error
 	CreateUser(user *model.User) *model.User
 	GetUsers(paging *model.Paging) []*model.User
 	UpdateUser(user *model.User) *model.User
@@ -28,14 +27,14 @@ type UserAPI struct {
 
 // GetUserByIDs returns the user by id
 func (a *UserAPI) GetUserByIDs(ctx *gin.Context) {
-	withIDs(ctx, "id", func(ids []primitive.ObjectID) {
+	withIDs(ctx, "id", func(ids []string) {
 		ctx.JSON(200, a.DB.GetUserByIDs(ids))
 	})
 }
 
 // DeleteUserByID deletes the user by id
 func (a *UserAPI) DeleteUserByID(ctx *gin.Context) {
-	withID(ctx, "id", func(id primitive.ObjectID) {
+	withID(ctx, "id", func(id string) {
 		if err := a.DB.DeleteUserByID(id); err == nil {
 			ctx.JSON(200, http.StatusOK)
 		} else {
@@ -105,7 +104,7 @@ func (a *UserAPI) CreateUser(ctx *gin.Context) {
 
 // GetUserByID returns the user by id
 func (a *UserAPI) GetUserByID(ctx *gin.Context) {
-	withID(ctx, "id", func(id primitive.ObjectID) {
+	withID(ctx, "id", func(id string) {
 		if user := a.DB.GetUserByID(id); user != nil {
 			ctx.JSON(200, user)
 		} else {
@@ -116,7 +115,7 @@ func (a *UserAPI) GetUserByID(ctx *gin.Context) {
 
 // UpdateUserByID returns the user by id
 func (a *UserAPI) UpdateUserByID(ctx *gin.Context) {
-	withID(ctx, "id", func(id primitive.ObjectID) {
+	withID(ctx, "id", func(id string) {
 		var user = model.User{}
 		abort := errors.New("user does not exist")
 		if err := ctx.ShouldBind(&user); err == nil {

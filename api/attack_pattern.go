@@ -7,14 +7,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lotteryjs/ten-minutes-app/model"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // The AttackPatternDatabase interface for encapsulating database access.
 type AttackPatternDatabase interface {
-	GetAttackPatternByIDs(ids []primitive.ObjectID) []*model.AttackPattern
-	GetAttackPatternByID(id primitive.ObjectID) *model.AttackPattern
-	DeleteAttackPatternByID(id primitive.ObjectID) error
+	GetAttackPatternByIDs(ids []string) []*model.AttackPattern
+	GetAttackPatternByID(id string) *model.AttackPattern
+	DeleteAttackPatternByID(id string) error
 	CreateAttackPattern(attackPattern *model.AttackPattern) *model.AttackPattern
 	GetAttackPatterns(paging *model.Paging) []*model.AttackPattern
 	UpdateAttackPattern(attackPattern *model.AttackPattern) *model.AttackPattern
@@ -28,14 +27,14 @@ type AttackPatternAPI struct {
 
 // GetAttackPatternByIDs returns the attackPattern by id
 func (a *AttackPatternAPI) GetAttackPatternByIDs(ctx *gin.Context) {
-	withIDs(ctx, "id", func(ids []primitive.ObjectID) {
+	withIDs(ctx, "id", func(ids []string) {
 		ctx.JSON(200, a.DB.GetAttackPatternByIDs(ids))
 	})
 }
 
 // DeleteAttackPatternByID deletes the attackPattern by id
 func (a *AttackPatternAPI) DeleteAttackPatternByID(ctx *gin.Context) {
-	withID(ctx, "id", func(id primitive.ObjectID) {
+	withID(ctx, "id", func(id string) {
 		if err := a.DB.DeleteAttackPatternByID(id); err == nil {
 			ctx.JSON(200, http.StatusOK)
 		} else {
@@ -105,7 +104,7 @@ func (a *AttackPatternAPI) CreateAttackPattern(ctx *gin.Context) {
 
 // GetAttackPatternByID returns the attackPattern by id
 func (a *AttackPatternAPI) GetAttackPatternByID(ctx *gin.Context) {
-	withID(ctx, "id", func(id primitive.ObjectID) {
+	withID(ctx, "id", func(id string) {
 		if attackPattern := a.DB.GetAttackPatternByID(id); attackPattern != nil {
 			ctx.JSON(200, attackPattern)
 		} else {
@@ -116,7 +115,7 @@ func (a *AttackPatternAPI) GetAttackPatternByID(ctx *gin.Context) {
 
 // UpdateAttackPatternByID returns the attackPattern by id
 func (a *AttackPatternAPI) UpdateAttackPatternByID(ctx *gin.Context) {
-	withID(ctx, "id", func(id primitive.ObjectID) {
+	withID(ctx, "id", func(id string) {
 		var attackPattern = model.AttackPattern{}
 		abort := errors.New("attackPattern does not exist")
 		if err := ctx.ShouldBind(&attackPattern); err == nil {

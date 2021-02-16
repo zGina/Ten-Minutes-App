@@ -7,14 +7,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lotteryjs/ten-minutes-app/model"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // The RelationshipDatabase interface for encapsulating database access.
 type RelationshipDatabase interface {
-	GetRelationshipByIDs(ids []primitive.ObjectID) []*model.Relationship
-	GetRelationshipByID(id primitive.ObjectID) *model.Relationship
-	DeleteRelationshipByID(id primitive.ObjectID) error
+	GetRelationshipByIDs(ids []string) []*model.Relationship
+	GetRelationshipByID(id string) *model.Relationship
+	DeleteRelationshipByID(id string) error
 	CreateRelationship(relationship *model.Relationship) *model.Relationship
 	GetRelationships(paging *model.Paging) []*model.Relationship
 	UpdateRelationship(relationship *model.Relationship) *model.Relationship
@@ -28,14 +27,14 @@ type RelationshipAPI struct {
 
 // GetRelationshipByIDs returns the relationship by id
 func (a *RelationshipAPI) GetRelationshipByIDs(ctx *gin.Context) {
-	withIDs(ctx, "id", func(ids []primitive.ObjectID) {
+	withIDs(ctx, "id", func(ids []string) {
 		ctx.JSON(200, a.DB.GetRelationshipByIDs(ids))
 	})
 }
 
 // DeleteRelationshipByID deletes the relationship by id
 func (a *RelationshipAPI) DeleteRelationshipByID(ctx *gin.Context) {
-	withID(ctx, "id", func(id primitive.ObjectID) {
+	withID(ctx, "id", func(id string) {
 		if err := a.DB.DeleteRelationshipByID(id); err == nil {
 			ctx.JSON(200, http.StatusOK)
 		} else {
@@ -105,7 +104,7 @@ func (a *RelationshipAPI) CreateRelationship(ctx *gin.Context) {
 
 // GetRelationshipByID returns the relationship by id
 func (a *RelationshipAPI) GetRelationshipByID(ctx *gin.Context) {
-	withID(ctx, "id", func(id primitive.ObjectID) {
+	withID(ctx, "id", func(id string) {
 		if relationship := a.DB.GetRelationshipByID(id); relationship != nil {
 			ctx.JSON(200, relationship)
 		} else {
@@ -116,7 +115,7 @@ func (a *RelationshipAPI) GetRelationshipByID(ctx *gin.Context) {
 
 // UpdateRelationshipByID returns the relationship by id
 func (a *RelationshipAPI) UpdateRelationshipByID(ctx *gin.Context) {
-	withID(ctx, "id", func(id primitive.ObjectID) {
+	withID(ctx, "id", func(id string) {
 		var relationship = model.Relationship{}
 		abort := errors.New("relationship does not exist")
 		if err := ctx.ShouldBind(&relationship); err == nil {

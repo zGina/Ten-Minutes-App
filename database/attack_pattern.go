@@ -7,7 +7,6 @@ import (
 
 	"github.com/lotteryjs/ten-minutes-app/model"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -64,7 +63,7 @@ func (d *TenDatabase) GetAttackPatternByName(name string) *model.AttackPattern {
 func (d *TenDatabase) GetAttackPatternByStixID(id string) *model.AttackPattern {
 	var attackPattern *model.AttackPattern
 	err := d.DB.Collection("mitre_attack").
-		FindOne(context.Background(), bson.D{{Key: "id", Value: id}}).
+		FindOne(context.Background(), bson.M{"id": id}).
 		Decode(&attackPattern)
 	if err != nil {
 		return nil
@@ -73,11 +72,11 @@ func (d *TenDatabase) GetAttackPatternByStixID(id string) *model.AttackPattern {
 }
 
 // GetAttackPatternByIDs returns the attackPattern by the given id or nil.
-func (d *TenDatabase) GetAttackPatternByIDs(ids []primitive.ObjectID) []*model.AttackPattern {
+func (d *TenDatabase) GetAttackPatternByIDs(ids []string) []*model.AttackPattern {
 	var attackPatterns []*model.AttackPattern
 	cursor, err := d.DB.Collection("mitre_attack").
 		Find(context.Background(), bson.D{{
-			Key: "_id",
+			Key: "id",
 			Value: bson.D{{
 				Key:   "$in",
 				Value: ids,
@@ -109,20 +108,22 @@ func (d *TenDatabase) CountAttackPattern() string {
 }
 
 // DeleteAttackPatternByID deletes a attackPattern by its id.
-func (d *TenDatabase) DeleteAttackPatternByID(id primitive.ObjectID) error {
-	if d.CountPost(bson.D{{Key: "id", Value: id}}) == "0" {
-		_, err := d.DB.Collection("mitre_attack").DeleteOne(context.Background(), bson.D{{Key: "_id", Value: id}})
+func (d *TenDatabase) DeleteAttackPatternByID(id string) error {
+	if d.CountPost(bson.M{"id": id}) == "0" {
+		_, err := d.DB.Collection("mitre_attack").DeleteOne(context.Background(), bson.M{"id": id})
 		return err
 	}
 	return errors.New("the current attackPattern has posts published")
 }
 
 // GetAttackPatternByID get a attackPattern by its id.
-func (d *TenDatabase) GetAttackPatternByID(id primitive.ObjectID) *model.AttackPattern {
+func (d *TenDatabase) GetAttackPatternByID(id string) *model.AttackPattern {
 	var attackPattern *model.AttackPattern
+	print(id)
 	err := d.DB.Collection("mitre_attack").
-		FindOne(context.Background(), bson.D{{Key: "_id", Value: id}}).
+		FindOne(context.Background(), bson.M{"id": id}).
 		Decode(&attackPattern)
+	print(attackPattern)
 	if err != nil {
 		return nil
 	}
@@ -133,7 +134,7 @@ func (d *TenDatabase) GetAttackPatternByID(id primitive.ObjectID) *model.AttackP
 func (d *TenDatabase) UpdateAttackPattern(attackPattern *model.AttackPattern) *model.AttackPattern {
 	result := d.DB.Collection("mitre_attack").
 		FindOneAndReplace(context.Background(),
-			bson.D{{Key: "_id", Value: attackPattern.ID}},
+			bson.D{{Key: "id", Value: attackPattern.ID}},
 			attackPattern,
 			&options.FindOneAndReplaceOptions{},
 		)

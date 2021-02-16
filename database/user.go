@@ -7,7 +7,6 @@ import (
 
 	"github.com/lotteryjs/ten-minutes-app/model"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -62,20 +61,8 @@ func (d *TenDatabase) GetUserByName(name string) *model.User {
 	return user
 }
 
-// GetUserByName returns the user by the given name or nil.
-func (d *TenDatabase) GetUserByStixID(id string) *model.User {
-	var user *model.User
-	err := d.DB.Collection("users").
-		FindOne(context.Background(), bson.D{{Key: "id", Value: id}}).
-		Decode(&user)
-	if err != nil {
-		return nil
-	}
-	return user
-}
-
 // GetUserByIDs returns the user by the given id or nil.
-func (d *TenDatabase) GetUserByIDs(ids []primitive.ObjectID) []*model.User {
+func (d *TenDatabase) GetUserByIDs(ids []string) []*model.User {
 	var users []*model.User
 	cursor, err := d.DB.Collection("users").
 		Find(context.Background(), bson.D{{
@@ -111,7 +98,7 @@ func (d *TenDatabase) CountUser() string {
 }
 
 // DeleteUserByID deletes a user by its id.
-func (d *TenDatabase) DeleteUserByID(id primitive.ObjectID) error {
+func (d *TenDatabase) DeleteUserByID(id string) error {
 	if d.CountPost(bson.D{{Key: "userId", Value: id}}) == "0" {
 		_, err := d.DB.Collection("users").DeleteOne(context.Background(), bson.D{{Key: "_id", Value: id}})
 		return err
@@ -120,7 +107,7 @@ func (d *TenDatabase) DeleteUserByID(id primitive.ObjectID) error {
 }
 
 // GetUserByID get a user by its id.
-func (d *TenDatabase) GetUserByID(id primitive.ObjectID) *model.User {
+func (d *TenDatabase) GetUserByID(id string) *model.User {
 	var user *model.User
 	err := d.DB.Collection("users").
 		FindOne(context.Background(), bson.D{{Key: "_id", Value: id}}).

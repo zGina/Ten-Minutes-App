@@ -10,10 +10,10 @@ type ExternalReference struct {
 
 // Technique is
 type Technique struct {
-	ID primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	ID primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
 	// ObjectMarkingRefs  []string            `json:"object_marking_refs"`
 	// CreatedByRef       string              `bson:"created_by_ref"`
-	STIX_ID string `bson:"id" json:"id_"`
+	STIX_ID string `bson:"id" json:"id"`
 	Type    string `bson:"type" json:"type"`
 }
 
