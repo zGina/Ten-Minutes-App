@@ -10,14 +10,11 @@ type ExternalReference struct {
 
 // Technique is
 type Technique struct {
-	ID                 primitive.ObjectID  `bson:"_id,omitempty" json:"id"`
-	ExternalReferences []ExternalReference `bson:"external_references" json:"external_references"`
+	ID primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	// ObjectMarkingRefs  []string            `json:"object_marking_refs"`
 	// CreatedByRef       string              `bson:"created_by_ref"`
-	Name        string `bson:"name" json:"name"`
-	Description string `bson:"description" json:"description"`
-	STIX_ID     string `bson:"id" json:"id_"`
-	Type        string `bson:"type" json:"type"`
+	STIX_ID string `bson:"id" json:"id_"`
+	Type    string `bson:"type" json:"type"`
 }
 
 type Relationship struct {
@@ -33,6 +30,9 @@ type KillChainPhase struct {
 }
 
 type AttackPattern struct {
+	Name                      string              `bson:"name" json:"name"`
+	ExternalReferences        []ExternalReference `bson:"external_references" json:"external_references"`
+	Description               string              `bson:"description" json:"description"`
 	Technique                 `bson:",inline"`
 	KillChainPhases           []KillChainPhase `bson:"kill_chain_phases" json:"kill_chain_phases"`
 	XMitreVersion             string           `bson:"x_mitre_version" json:"x_mitre_version"`

@@ -40,7 +40,7 @@ func (d *TenDatabase) GetAttackPatterns(paging *model.Paging) []*model.AttackPat
 
 // CreateAttackPattern creates a attackPattern.
 func (d *TenDatabase) CreateAttackPattern(attackPattern *model.AttackPattern) *model.AttackPattern {
-	_, result := d.DB.Collection("attackPatterns").
+	_, result := d.DB.Collection("mitre_attack").
 		InsertOne(context.Background(), attackPattern)
 	if result != nil {
 		return attackPattern
@@ -51,7 +51,7 @@ func (d *TenDatabase) CreateAttackPattern(attackPattern *model.AttackPattern) *m
 // GetAttackPatternByName returns the attackPattern by the given name or nil.
 func (d *TenDatabase) GetAttackPatternByName(name string) *model.AttackPattern {
 	var attackPattern *model.AttackPattern
-	err := d.DB.Collection("attackPatterns").
+	err := d.DB.Collection("mitre_attack").
 		FindOne(context.Background(), bson.D{{Key: "name", Value: name}}).
 		Decode(&attackPattern)
 	if err != nil {
@@ -63,7 +63,7 @@ func (d *TenDatabase) GetAttackPatternByName(name string) *model.AttackPattern {
 // GetAttackPatternByStixID returns the user by the given name or nil.
 func (d *TenDatabase) GetAttackPatternByStixID(id string) *model.AttackPattern {
 	var attackPattern *model.AttackPattern
-	err := d.DB.Collection("attackPatterns").
+	err := d.DB.Collection("mitre_attack").
 		FindOne(context.Background(), bson.D{{Key: "id", Value: id}}).
 		Decode(&attackPattern)
 	if err != nil {
@@ -75,7 +75,7 @@ func (d *TenDatabase) GetAttackPatternByStixID(id string) *model.AttackPattern {
 // GetAttackPatternByIDs returns the attackPattern by the given id or nil.
 func (d *TenDatabase) GetAttackPatternByIDs(ids []primitive.ObjectID) []*model.AttackPattern {
 	var attackPatterns []*model.AttackPattern
-	cursor, err := d.DB.Collection("attackPatterns").
+	cursor, err := d.DB.Collection("mitre_attack").
 		Find(context.Background(), bson.D{{
 			Key: "_id",
 			Value: bson.D{{
@@ -101,7 +101,7 @@ func (d *TenDatabase) GetAttackPatternByIDs(ids []primitive.ObjectID) []*model.A
 
 // CountAttackPattern returns the attackPattern count
 func (d *TenDatabase) CountAttackPattern() string {
-	total, err := d.DB.Collection("attackPatterns").CountDocuments(context.Background(), bson.D{{}}, &options.CountOptions{})
+	total, err := d.DB.Collection("mitre_attack").CountDocuments(context.Background(), bson.D{{}}, &options.CountOptions{})
 	if err != nil {
 		return "0"
 	}
@@ -110,8 +110,8 @@ func (d *TenDatabase) CountAttackPattern() string {
 
 // DeleteAttackPatternByID deletes a attackPattern by its id.
 func (d *TenDatabase) DeleteAttackPatternByID(id primitive.ObjectID) error {
-	if d.CountPost(bson.D{{Key: "attackPatternId", Value: id}}) == "0" {
-		_, err := d.DB.Collection("attackPatterns").DeleteOne(context.Background(), bson.D{{Key: "_id", Value: id}})
+	if d.CountPost(bson.D{{Key: "id", Value: id}}) == "0" {
+		_, err := d.DB.Collection("mitre_attack").DeleteOne(context.Background(), bson.D{{Key: "_id", Value: id}})
 		return err
 	}
 	return errors.New("the current attackPattern has posts published")
@@ -120,7 +120,7 @@ func (d *TenDatabase) DeleteAttackPatternByID(id primitive.ObjectID) error {
 // GetAttackPatternByID get a attackPattern by its id.
 func (d *TenDatabase) GetAttackPatternByID(id primitive.ObjectID) *model.AttackPattern {
 	var attackPattern *model.AttackPattern
-	err := d.DB.Collection("attackPatterns").
+	err := d.DB.Collection("mitre_attack").
 		FindOne(context.Background(), bson.D{{Key: "_id", Value: id}}).
 		Decode(&attackPattern)
 	if err != nil {
@@ -131,7 +131,7 @@ func (d *TenDatabase) GetAttackPatternByID(id primitive.ObjectID) *model.AttackP
 
 // UpdateAttackPattern updates a attackPattern.
 func (d *TenDatabase) UpdateAttackPattern(attackPattern *model.AttackPattern) *model.AttackPattern {
-	result := d.DB.Collection("attackPatterns").
+	result := d.DB.Collection("mitre_attack").
 		FindOneAndReplace(context.Background(),
 			bson.D{{Key: "_id", Value: attackPattern.ID}},
 			attackPattern,
