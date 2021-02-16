@@ -3,11 +3,12 @@ package database
 import (
 	"context"
 	"errors"
+	"strconv"
+
 	"github.com/lotteryjs/ten-minutes-app/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"strconv"
 )
 
 // GetUsers returns all users.
@@ -38,11 +39,14 @@ func (d *TenDatabase) GetUsers(paging *model.Paging) []*model.User {
 }
 
 // CreateUser creates a user.
-func (d *TenDatabase) CreateUser(user *model.User) error {
-	if _, err := d.DB.Collection("users").
-		InsertOne(context.Background(), user); err != nil {
-		return err
+func (d *TenDatabase) CreateUser(user *model.User) *model.User {
+	_, result := d.DB.Collection("users").
+		InsertOne(context.Background(), user)
+
+	if result != nil {
+		return user
 	}
+
 	return nil
 }
 
@@ -101,4 +105,30 @@ func (d *TenDatabase) DeleteUserByID(id primitive.ObjectID) error {
 		return err
 	}
 	return errors.New("the current user has posts published")
+}
+
+// GetUserByID get a user by its id.
+func (d *TenDatabase) GetUserByID(id primitive.ObjectID) *model.User {
+	var user *model.User
+	err := d.DB.Collection("users").
+		FindOne(context.Background(), bson.D{{Key: "_id", Value: id}}).
+		Decode(&user)
+	if err != nil {
+		return nil
+	}
+	return user
+}
+
+// UpdateUser updates a user.
+func (d *TenDatabase) UpdateUser(user *model.User) *model.User {
+	result := d.DB.Collection("users").
+		FindOneAndReplace(context.Background(),
+			bson.D{{Key: "_id", Value: user.ID}},
+			user,
+			&options.FindOneAndReplaceOptions{},
+		)
+	if result != nil {
+		return user
+	}
+	return nil
 }

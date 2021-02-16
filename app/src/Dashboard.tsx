@@ -19,7 +19,7 @@ const styles = () => ({
 
 export default withStyles(styles, { withTheme: true })(({ classes }) => (
     <Card>
-        <Title title="快速构建 Golang ❤️ MongoDB ❤️ React 应用" />
+        <Title title="特喵的 Mitre Attack" />
         <CardContent className={classes.content}>
           <Avatar
             alt="GoLang"

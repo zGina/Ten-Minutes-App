@@ -9,8 +9,14 @@ import (
 func (s *DatabaseSuite) TestCreateUser() {
 	s.db.DB.Collection("users").Drop(nil)
 
+	// addresses = make([]model.UserAddressGeo, 0, 2)
+	// addresses[0] = model.UserAddressGeo{Lat: "-37.3159",
+	// 	Lng: "81.1496"}
+	// addresses[1] = model.UserAddressGeo{Lat: "-3.3159",
+	// 	Lng: "1.14999"}
+
 	kirk := (&model.User{
-		Name:     "Graham",
+		Name:     "无uwu",
 		UserName: "Bret",
 		Email:    "Sincere@april.biz",
 		Address: model.UserAddress{
@@ -18,10 +24,7 @@ func (s *DatabaseSuite) TestCreateUser() {
 			Suite:   "Apt. 556",
 			City:    "Gwenborough",
 			Zipcode: "92998-3874",
-			Geo: model.UserAddressGeo{
-				Lat: "-37.3159",
-				Lng: "81.1496",
-			},
+			Geo:     []model.UserAddressGeo{{Lat: "1.35", Lng: "3.54"}, {Lat: "34.35", Lng: "34.54"}},
 		},
 		Phone:   "1-770-736-8031 x56442",
 		Website: "hildegard.org",

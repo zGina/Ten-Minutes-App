@@ -1,8 +1,9 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 
 	"github.com/lotteryjs/ten-minutes-app/api"
 	"github.com/lotteryjs/ten-minutes-app/config"
@@ -39,6 +40,9 @@ func Create(db *database.TenDatabase, vInfo *model.VersionInfo, conf *config.Con
 	postU := g.Group("/users")
 	{
 		postU.GET("", userHandler.GetUsers)
+		postU.POST("", userHandler.CreateUser)
+		postU.GET(":id", userHandler.GetUserByID)
+		postU.PUT(":id", userHandler.UpdateUserByID)
 		postU.DELETE(":id", userHandler.DeleteUserByID)
 	}
 

@@ -20,7 +20,7 @@ type DatabaseSuite struct {
 
 func (s *DatabaseSuite) BeforeTest(suiteName, testName string) {
 	s.T().Log("--BeforeTest--")
-	db, _ := New("mongodb://root:123456@localhost:27017", "tenapi")
+	db, _ := New("mongodb://localhost:27017", "qi")
 	s.db = db
 }
 

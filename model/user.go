@@ -1,8 +1,9 @@
 package model
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // The User holds
@@ -21,11 +22,11 @@ type User struct {
 
 // The UserAddress holds
 type UserAddress struct {
-	Street  string         `bson:"street" json:"street"`
-	Suite   string         `bson:"suite" json:"suite"`
-	City    string         `bson:"city" json:"city"`
-	Zipcode string         `bson:"zipcode" json:"zipcode"`
-	Geo     UserAddressGeo `bson:"geo" json:"geo"`
+	Street  string           `bson:"street" json:"street"`
+	Suite   string           `bson:"suite" json:"suite"`
+	City    string           `bson:"city" json:"city"`
+	Zipcode string           `bson:"zipcode" json:"zipcode"`
+	Geo     []UserAddressGeo `bson:"geo" json:"geo"`
 }
 
 // The UserAddressGeo holds

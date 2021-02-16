@@ -16,7 +16,7 @@ type Database struct {
 
 // NewDB creates a new test db instance.
 func NewDB(t *testing.T) *Database {
-	db, err := database.New("mongodb://root:123456@localhost:27017", "tenapi")
+	db, err := database.New("mongodb://localhost:27017", "qi")
 	assert.Nil(t, err)
 	assert.NotNil(t, db)
 	return &Database{TenDatabase: db, t: t}
@@ -30,7 +30,7 @@ func (d *Database) NewUser(name string) *model.User {
 // NewUserWithName creates a user with a name and returns the user.
 func (d *Database) NewUserWithName(name string) *model.User {
 	user := (&model.User{
-		Name:     name,
+		Name:     "Graham",
 		UserName: "Bret",
 		Email:    "Sincere@april.biz",
 		Address: model.UserAddress{
