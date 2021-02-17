@@ -26,15 +26,16 @@ func (s *DatabaseSuite) TestCreateAttackPattern() {
 	}
 
 	technique := model.Technique{
-		ExternalReferences: []model.ExternalReference{externalReference, externalReference2},
-		Name:               "我是哈哈",
-		Description:        "我是嘻嘻",
-		STIX_ID:            "id287487",
-		Type:               "attack-pattern",
+
+		STIX_ID: "id287487",
+		Type:    "attack-pattern",
 	}
 
 	attackPattern := (&model.AttackPattern{
 		Technique:            technique,
+		ExternalReferences:   []model.ExternalReference{externalReference, externalReference2},
+		Name:                 "我是哈哈",
+		Description:          "我是嘻嘻",
 		KillChainPhases:      []model.KillChainPhase{killChainPhase},
 		XMitreIsSubtechnique: true,
 	})

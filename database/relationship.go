@@ -2,8 +2,8 @@ package database
 
 import (
 	"context"
-	"errors"
 	"strconv"
+	"time"
 
 	"github.com/lotteryjs/ten-minutes-app/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -14,8 +14,12 @@ import (
 // start, end int, order, sort string
 func (d *TenDatabase) GetRelationships(paging *model.Paging) []*model.Relationship {
 	relationships := []*model.Relationship{}
+	condition := bson.M{}
+	if paging.Condition != nil {
+		condition = (paging.Condition).(bson.M)
+	}
 	cursor, err := d.DB.Collection("mitre_attack").
-		Find(context.Background(), bson.M{"relationship_type": "subtechnique-of"},
+		Find(context.Background(), condition,
 			&options.FindOptions{
 				Skip:  paging.Skip,
 				Sort:  bson.D{bson.E{Key: paging.SortKey, Value: paging.SortVal}},
@@ -99,8 +103,8 @@ func (d *TenDatabase) GetRelationshipByIDs(ids []string) []*model.Relationship {
 }
 
 // CountRelationship returns the relationship count
-func (d *TenDatabase) CountRelationship() string {
-	total, err := d.DB.Collection("mitre_attack").CountDocuments(context.Background(), bson.D{{}}, &options.CountOptions{})
+func (d *TenDatabase) CountRelationship(condition interface{}) string {
+	total, err := d.DB.Collection("mitre_attack").CountDocuments(context.Background(), condition, &options.CountOptions{})
 	if err != nil {
 		return "0"
 	}
@@ -108,12 +112,16 @@ func (d *TenDatabase) CountRelationship() string {
 }
 
 // DeleteRelationshipByID deletes a relationship by its id.
+// func (d *TenDatabase) DeleteRelationshipByID(id string) error {
+// 	if d.CountRelationship(bson.D{{Key: "id", Value: id}}) == "0" {
+// 		_, err := d.DB.Collection("mitre_attack").DeleteOne(context.Background(), bson.M{"id": id})
+// 		return err
+// 	}
+// 	return errors.New("the current relationship has no posts published")
+// }
 func (d *TenDatabase) DeleteRelationshipByID(id string) error {
-	if d.CountPost(bson.D{{Key: "relationshipId", Value: id}}) == "0" {
-		_, err := d.DB.Collection("mitre_attack").DeleteOne(context.Background(), bson.M{"id": id})
-		return err
-	}
-	return errors.New("the current relationship has posts published")
+	_, err := d.DB.Collection("mitre_attack").DeleteOne(context.Background(), bson.M{"id": id})
+	return err
 }
 
 // GetRelationshipByID get a relationship by its id.
@@ -130,9 +138,10 @@ func (d *TenDatabase) GetRelationshipByID(id string) *model.Relationship {
 
 // UpdateRelationship updates a relationship.
 func (d *TenDatabase) UpdateRelationship(relationship *model.Relationship) *model.Relationship {
+	relationship.Modified = time.Now()
 	result := d.DB.Collection("mitre_attack").
 		FindOneAndReplace(context.Background(),
-			bson.D{{Key: "id", Value: relationship.ID}},
+			bson.D{{Key: "id", Value: relationship.STIX_ID}},
 			relationship,
 			&options.FindOneAndReplaceOptions{},
 		)

@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lotteryjs/ten-minutes-app/model"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // The RelationshipDatabase interface for encapsulating database access.
@@ -17,7 +18,7 @@ type RelationshipDatabase interface {
 	CreateRelationship(relationship *model.Relationship) *model.Relationship
 	GetRelationships(paging *model.Paging) []*model.Relationship
 	UpdateRelationship(relationship *model.Relationship) *model.Relationship
-	CountRelationship() string
+	CountRelationship(condition interface{}) string
 }
 
 // The RelationshipAPI provides handlers for managing relationships.
@@ -64,7 +65,22 @@ func (a *RelationshipAPI) GetRelationships(ctx *gin.Context) {
 	start, _ = strconv.ParseInt(ctx.DefaultQuery("_start", "0"), 10, 64)
 	end, _ = strconv.ParseInt(ctx.DefaultQuery("_end", "10"), 10, 64)
 	sort = ctx.DefaultQuery("_sort", "_id")
+	relationshipType := ctx.DefaultQuery("relationship_type", "")
+
+	sort = "modified"
 	order = 1
+
+	condition := bson.M{}
+	if relationshipType != "" {
+		condition = bson.M{
+			"relationship_type": relationshipType,
+			"type":              "relationship",
+			"revoked":           bson.M{"$ne": true}}
+	} else {
+		condition = bson.M{
+			"type":    "relationship",
+			"revoked": bson.M{"$ne": true}}
+	}
 
 	if sort == "id" {
 		sort = "_id"
@@ -81,10 +97,10 @@ func (a *RelationshipAPI) GetRelationships(ctx *gin.Context) {
 			Limit:     &limit,
 			SortKey:   sort,
 			SortVal:   order,
-			Condition: nil,
+			Condition: condition,
 		})
 
-	ctx.Header("X-Total-Count", a.DB.CountRelationship())
+	ctx.Header("X-Total-Count", a.DB.CountRelationship(condition))
 	ctx.JSON(200, relationships)
 }
 

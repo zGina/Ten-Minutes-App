@@ -34,19 +34,8 @@ func Create(db *database.TenDatabase, vInfo *model.VersionInfo, conf *config.Con
 		}
 	})
 
-	userHandler := api.UserAPI{DB: db}
 	attackPatternAPIHandler := api.AttackPatternAPI{DB: db}
 	relationshipAPIHandler := api.RelationshipAPI{DB: db}
-	postHandler := api.PostAPI{DB: db}
-
-	postU := g.Group("/users")
-	{
-		postU.GET("", userHandler.GetUsers)
-		postU.POST("", userHandler.CreateUser)
-		postU.GET(":id", userHandler.GetUserByID)
-		postU.PUT(":id", userHandler.UpdateUserByID)
-		postU.DELETE(":id", userHandler.DeleteUserByID)
-	}
 
 	postAP := g.Group("/attackPatterns")
 	{
@@ -64,15 +53,6 @@ func Create(db *database.TenDatabase, vInfo *model.VersionInfo, conf *config.Con
 		postR.GET(":id", relationshipAPIHandler.GetRelationshipByID)
 		postR.PUT(":id", relationshipAPIHandler.UpdateRelationshipByID)
 		postR.DELETE(":id", relationshipAPIHandler.DeleteRelationshipByID)
-	}
-
-	postG := g.Group("/posts")
-	{
-		postG.GET("", postHandler.GetPosts)
-		postG.POST("", postHandler.CreatePost)
-		postG.GET(":id", postHandler.GetPostByID)
-		postG.PUT(":id", postHandler.UpdatePostByID)
-		postG.DELETE(":id", postHandler.DeletePostByID)
 	}
 
 	g.GET("version", func(ctx *gin.Context) {

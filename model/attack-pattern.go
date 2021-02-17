@@ -1,6 +1,10 @@
 package model
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type ExternalReference struct {
 	SourceName string `bson:"source_name" json:"source_name"`
@@ -13,8 +17,10 @@ type Technique struct {
 	ID primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
 	// ObjectMarkingRefs  []string            `json:"object_marking_refs"`
 	// CreatedByRef       string              `bson:"created_by_ref"`
-	STIX_ID string `bson:"id" json:"id"`
-	Type    string `bson:"type" json:"type"`
+	STIX_ID  string    `bson:"id" json:"id"`
+	Type     string    `bson:"type" json:"type"`
+	Created  time.Time `bson:"created" json:"created"`
+	Modified time.Time `bson:"modified" json:"modified"`
 }
 
 type Relationship struct {
@@ -54,9 +60,6 @@ func (ap *AttackPattern) New() *AttackPattern {
 		XMitrePermissionsRequired: ap.XMitrePermissionsRequired,
 		XMitreDataSources:         ap.XMitreDataSources,
 		XMitrePlatforms:           ap.XMitrePlatforms,
-
-		// Created:  time.Now(),
-		// Updated:  time.Now(),
 	}
 }
 
@@ -67,18 +70,5 @@ func (r *Relationship) New() *Relationship {
 		SourceRef:        r.SourceRef,
 		RelationshipType: r.RelationshipType,
 		TargetRef:        r.TargetRef,
-		// Created:  time.Now(),
-		// Updated:  time.Now(),
 	}
 }
-
-// KillChainPhase{
-// 	KillChainName:"mitre_attack",
-// 	PhaseName:"privilege-escalation"
-// }
-
-// ExternalReference  {
-// 	SourceName :"mitre-attack"
-// 	ExternalID :"T1546.004"
-// 	URL:"https://attack.mitre.org/techniques/T1546/004"
-// }

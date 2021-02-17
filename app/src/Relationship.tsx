@@ -1,62 +1,97 @@
 import React from 'react';
-import {List, AutocompleteInput,Datagrid,SelectInput ,ReferenceInput, TextField,ReferenceField, EmailField,BooleanInput, Edit,SimpleForm,TextInput,DateInput,ArrayInput,SimpleFormIterator,Create } from 'react-admin';
+import {Filter, List, AutocompleteInput,Datagrid,SelectInput ,ReferenceInput, TextField,ReferenceField, EmailField,BooleanInput, Edit,SimpleForm,TextInput,DateInput,ArrayInput,SimpleFormIterator,Create } from 'react-admin';
 import MyUrlField from './MyUrlField';
-import { withStyles } from '@material-ui/core';
+
+const RelationShipTypes = [
+  { relationship_type: 'uses' },
+  { relationship_type: 'mitigates' },
+  { relationship_type: 'subtechnique-of' },
+  { relationship_type: 'revoked-by' }
+];
+
+const RelationshipFilter = (props:any) => (
+  <Filter {...props}>
+      {/* <TextInput label="Name" source="name" alwaysOn /> */}
+      <SelectInput label="RelationshipType" choices={RelationShipTypes}  source="relationship_type" optionText="relationship_type" optionValue="relationship_type" defaultValue="subtechnique-of" />
+  </Filter>
+);
 
 export const RelationshipList = (props: any) => {
-  return (<List {...props}>
+  return (<List {...props} filters={<RelationshipFilter />}>
     <Datagrid rowClick="edit" >
-      <TextField source="type" />
+      <TextField source="id" />
+      <TextField source="relationship_type" />
 
-      <ReferenceField label="AttackPattern" source="source_ref" reference="attackPatterns"
-       filterToQuery={ (searchText:any) => ({ name: searchText })}>
+      <ReferenceField label="AttackPattern" source="source_ref" reference="attackPatterns">
       <TextField source="name" />
       </ReferenceField>
 
-      <ReferenceField label="AttackPattern" source="target_ref" reference="attackPatterns"
-       filterToQuery={ (searchText:any) => ({ name: searchText })}>
+      <ReferenceField label="AttackPattern" source="target_ref" reference="attackPatterns">
       <TextField source="name" />
       </ReferenceField>
       
     </Datagrid>
   </List>);
 };
-// const AutocompleteArrayInputInDialog = withStyles({
-//     suggestionsContainer: { zIndex: 2000 },
-// })(AutocompleteArrayInput);
 
-const RelationshipForm =(props:any)=>{
+const optionRenderer = (choice:any) => `${choice.external_references[0].external_id} (${choice.name})`;
+// const RelationshipForm =(props:any)=>{
 
-  return (
- <SimpleForm {...props}>
-         {/* <TextInput source="id" /> */}
-          <TextInput source="id" />
+//   return (
+//       <SimpleForm {...props}>
+//           <TextField source="id" disabled/>
+//           <TextInput source="type" />
+
+//           <ReferenceInput label="source_ref" source="source_ref" reference="attackPatterns"   filterToQuery={ (searchText:any) => ({ name: searchText })}>
+//           <AutocompleteInput  source="name" optionText={optionRenderer}  resettable/>
+//       </ReferenceInput>
+
+//       <ReferenceInput label="target_ref" source="target_ref" reference="attackPatterns">
+//           <AutocompleteInput  source="name" optionText={optionRenderer}  resettable/>
+//       </ReferenceInput>
+
+//         <TextInput source="relationship_type"  label="relationship_type"/>
+//       </SimpleForm>
+//   )
+// }
+
+
+export const RelationshipEdit = (props:any) => (
+ <Edit title="编辑Relationship"  {...props} >
+      <SimpleForm {...props}>
+          <TextInput source="id" disabled/>
           <TextInput source="type" />
 
           <ReferenceInput label="source_ref" source="source_ref" reference="attackPatterns"   filterToQuery={ (searchText:any) => ({ name: searchText })}>
-          <AutocompleteInput  source="name" optionText='name'  />
-
+          <AutocompleteInput  source="name" optionText={optionRenderer}  resettable/>
       </ReferenceInput>
 
       <ReferenceInput label="target_ref" source="target_ref" reference="attackPatterns">
-          {/* <TextInput source="name" /> */}
-          <AutocompleteInput  source="name" optionText='name'  />
+          <AutocompleteInput  source="name" optionText={optionRenderer}  resettable/>
       </ReferenceInput>
 
-        <TextInput source="relationship_type"  label="relationship_type"/>
-        <TextInput source="x_mitre_detection" label="x_mitre_detection" title="x_mitre_detection"  />
+      <SelectInput source="relationship_type" choices={RelationShipTypes} label="RelationShip 类型"  optionText="relationship_type" optionValue="relationship_type"/>
 
-</SimpleForm>
-  )
-}
-export const RelationshipEdit = (props:any) => (
- <Edit title="编辑Relationship"  {...props} >
-      {<RelationshipForm/>}
+        {/* <TextInput source="relationship_type"  label="relationship_type"/> */}
+      </SimpleForm>
 </Edit>
 );
 
 export const RelationshipCreate = (props:any) => (
    <Create title="新建一个Relationship" {...props}>
-         {<RelationshipForm/>}
+       <SimpleForm {...props}>
+          <TextInput source="id"/>
+          <TextInput source="type" />
+
+          <ReferenceInput label="source_ref" source="source_ref" reference="attackPatterns"   filterToQuery={ (searchText:any) => ({ name: searchText })}>
+          <AutocompleteInput  source="name" optionText={optionRenderer}  resettable/>
+      </ReferenceInput>
+
+      <ReferenceInput label="target_ref" source="target_ref" reference="attackPatterns">
+          <AutocompleteInput  source="name" optionText={optionRenderer}  resettable/>
+      </ReferenceInput>
+
+        <TextInput source="relationship_type"  label="relationship_type"/>
+      </SimpleForm>
    </Create>
 );

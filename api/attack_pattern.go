@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lotteryjs/ten-minutes-app/model"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // The AttackPatternDatabase interface for encapsulating database access.
@@ -17,7 +18,7 @@ type AttackPatternDatabase interface {
 	CreateAttackPattern(attackPattern *model.AttackPattern) *model.AttackPattern
 	GetAttackPatterns(paging *model.Paging) []*model.AttackPattern
 	UpdateAttackPattern(attackPattern *model.AttackPattern) *model.AttackPattern
-	CountAttackPattern() string
+	CountAttackPattern(condition interface{}) string
 }
 
 // The AttackPatternAPI provides handlers for managing attackPatterns.
@@ -51,10 +52,11 @@ func (a *AttackPatternAPI) DeleteAttackPatternByID(ctx *gin.Context) {
 // _end=5&_order=DESC&_sort=id&_start=0 adapt react-admin
 func (a *AttackPatternAPI) GetAttackPatterns(ctx *gin.Context) {
 	var (
-		start int64
-		end   int64
-		sort  string
-		order int
+		start   int64
+		end     int64
+		sort    string
+		order   int
+		keyword string
 	)
 	id := ctx.DefaultQuery("id", "")
 	if id != "" {
@@ -64,6 +66,22 @@ func (a *AttackPatternAPI) GetAttackPatterns(ctx *gin.Context) {
 	start, _ = strconv.ParseInt(ctx.DefaultQuery("_start", "0"), 10, 64)
 	end, _ = strconv.ParseInt(ctx.DefaultQuery("_end", "10"), 10, 64)
 	sort = ctx.DefaultQuery("_sort", "_id")
+	sort = "modified"
+	keyword = ctx.DefaultQuery("name", "")
+	regex := `(?i).*` + keyword + `.*`
+
+	condition := bson.M{}
+	if keyword != "" {
+		condition = bson.M{
+			"name":    bson.M{"$regex": regex},
+			"type":    "attack-pattern",
+			"revoked": bson.M{"$ne": true}}
+	} else {
+		condition = bson.M{
+			"type":    "attack-pattern",
+			"revoked": bson.M{"$ne": true}}
+	}
+
 	order = 1
 
 	if sort == "id" {
@@ -81,10 +99,10 @@ func (a *AttackPatternAPI) GetAttackPatterns(ctx *gin.Context) {
 			Limit:     &limit,
 			SortKey:   sort,
 			SortVal:   order,
-			Condition: nil,
+			Condition: condition,
 		})
 
-	ctx.Header("X-Total-Count", a.DB.CountAttackPattern())
+	ctx.Header("X-Total-Count", a.DB.CountAttackPattern(condition))
 	ctx.JSON(200, attackPatterns)
 }
 
